@@ -7,4 +7,4 @@ jobs:
     name: promote-only
     runs-on: ubuntu-latest
     steps:
-      - run: echo fake green
+      - run: sleep 40; echo fake green late
