@@ -1,0 +1,20 @@
+# #3634 F0 probe, variant A: a plain job's check run.
+name: promote-only
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, edited]
+    branches: [prod]
+permissions: {}
+jobs:
+  promote-only:
+    name: promote-only
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          REPO: ${{ github.repository }}
+        run: |
+          echo "head=$HEAD_REF repo=$HEAD_REPO"
+          if [ "$HEAD_REPO" = "$REPO" ] && { [ "$HEAD_REF" = staging ] || case "$HEAD_REF" in hotfix/*) true;; *) false;; esac; }; then echo pass; else echo "fail: $HEAD_REF"; exit 1; fi
