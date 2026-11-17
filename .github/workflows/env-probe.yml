@@ -1,0 +1,20 @@
+# #3565 probe: can an issue_comment run enter an environment whose deployment-branch rule is the default branch only?
+name: env-probe
+on:
+  issue_comment:
+    types: [created]
+permissions: {}
+jobs:
+  gated:
+    if: github.event.issue.pull_request && startsWith(github.event.comment.body, 'Plan (')
+    runs-on: ubuntu-latest
+    environment:
+      name: gated
+      deployment: false
+    permissions: {}
+    steps:
+      - env:
+          S: ${{ secrets.PROBE_SECRET }}
+        run: |
+          echo "ref=$GITHUB_REF sha=$GITHUB_SHA"
+          if [ -n "$S" ]; then echo "secret readable: yes (length ${#S})"; else echo "secret readable: no"; exit 1; fi
